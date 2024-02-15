@@ -1,0 +1,58 @@
+.boardMain {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 4rem;
+    padding: 6rem;
+    min-height: 100vh;
+}
+
+.boardTitle {
+    font-size: 6rem;
+}
+
+.boardBody {
+    display: flex;
+    width: 600px;
+    height: 600px;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.boardButton {
+    padding: 1rem;
+    cursor: pointer;
+}
+
+.boardTurn {
+    font-size: 2rem;
+}
+
+.dialog {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    padding: 1rem;
+    border-color: rgb(28, 95, 171);
+    width: 400px;
+}
+
+.dialogBody {
+   display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2rem;
+}
+
+.dialog button {
+    padding: 1rem;
+}
+
+.dialog::backdrop {
+    background-color: #d4d4d4;
+    opacity: 0.3;
+}

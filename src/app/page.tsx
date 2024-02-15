@@ -1,5 +1,5 @@
-import Board from "../../components/board/Board";
+import BoardGame from "../../components/boardGame/BoardGame";
 
 export default function Home() {
-  return <Board />;
+  return <BoardGame />;
 }
