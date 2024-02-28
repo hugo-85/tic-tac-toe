@@ -10,7 +10,11 @@ interface SquareProps {
 
 const Square: FC<SquareProps> = ({ board, value, index, updateBoard }) => {
   return (
-    <div className={styles.squareBox} onClick={() => updateBoard(board, index)}>
+    <div
+      data-testid={"square"}
+      className={styles.squareBox}
+      onClick={() => updateBoard(board, index)}
+    >
       {value}
     </div>
   );

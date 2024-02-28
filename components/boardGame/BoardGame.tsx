@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import styles from "./board.module.css";
 import Square from "../square/Square";
 
@@ -20,34 +20,43 @@ const WINNER_SETS = [
   [2, 4, 6],
 ];
 
+const createEmptyBoard = () => {
+  return new Array(9).fill(null);
+};
+
 interface BoardProps {}
 
 const BoardGame: FC<BoardProps> = () => {
-  const [board, setBoard] = useState<any[]>(() =>
-    window.localStorage.getItem("board")
-      ? JSON.parse(window.localStorage.getItem("board") || "[]")
-      : new Array(9).fill(null)
-  );
-  const [turn, setTurn] = useState(() =>
-    window.localStorage.getItem("turn")
-      ? window.localStorage.getItem("turn")
-      : TURNS.X
-  );
+  const [board, setBoard] = useState<any[]>(createEmptyBoard());
+  const [turn, setTurn] = useState(TURNS.X);
   const [winner, setWinner] = useState(false);
   const ref = useRef<HTMLDialogElement | null>(null);
 
+  useEffect(() => {
+    if (window?.localStorage.getItem("board"))
+      setBoard(
+        JSON.parse(window.localStorage.getItem("board") || "") ||
+          createEmptyBoard()
+      );
+
+    if (window.localStorage.getItem("turn"))
+      setTurn(window.localStorage.getItem("turn") || TURNS.X);
+  }, []);
+
   const checkWinner = (newBoard: any[]) => {
-    WINNER_SETS.forEach((set) => {
+    for (let i = 0; i < WINNER_SETS.length; i++) {
+      const set = WINNER_SETS[i];
       if (
         newBoard[set[0]] &&
         newBoard[set[0]] === newBoard[set[1]] &&
         newBoard[set[0]] === newBoard[set[2]]
       ) {
         setWinner(true);
-        ref.current?.showModal();
-        return;
+        ref?.current?.showModal();
+        return true;
       }
-    });
+    }
+    return false;
   };
 
   const updateBoard = (board: any[], index: number) => {
@@ -57,12 +66,25 @@ const BoardGame: FC<BoardProps> = () => {
     newBoard[index] = turn;
 
     setBoard(newBoard);
-    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
-    setTurn(newTurn);
-    checkWinner(newBoard);
 
-    window.localStorage.setItem("board", JSON.stringify(board));
-    window.localStorage.setItem("turn", JSON.stringify(newTurn));
+    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
+    const thereIsaWinner = checkWinner(newBoard);
+
+    if (!thereIsaWinner) {
+      setTurn(newTurn);
+      window.localStorage.setItem("board", JSON.stringify(newBoard));
+      window.localStorage.setItem("turn", newTurn);
+
+      //could be a draw
+      if (!newBoard.some((val) => val === null)) {
+        ref.current?.showModal();
+        window.localStorage.removeItem("board");
+        window.localStorage.removeItem("turn");
+      }
+    } else {
+      window.localStorage.removeItem("board");
+      window.localStorage.removeItem("turn");
+    }
   };
 
   const resetGame = () => {
@@ -99,7 +121,7 @@ const BoardGame: FC<BoardProps> = () => {
       </section>
       <dialog ref={ref} className={styles.dialog}>
         <div className={styles.dialogBody}>
-          <h2>Winner is {turn} !!!!</h2>
+          {<h2>{winner ? `Winner is ${turn} !!!!` : "Its a draw"}</h2>}
           <button onClick={() => ref.current?.close()}>close</button>
         </div>
       </dialog>
